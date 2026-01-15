@@ -1,0 +1,28 @@
+Main project outcome:
+    - Help design an ML pipeline via drag-and-drop 
+    - Validate the pipeline according to the standard structure: 
+        1. Data processing (Data ingestion (csv/json/sql/api/webscraping), Data preprocessing, 
+            Data exploration (eda by univariate/bivariate/multivariate analysis or simply pandas profiling), Feature engineering, Data splitting)
+        2. Model development (Model selection (linear regression and logistic regression, random forests and decision trees, neural networks), 
+            Hyperparameter tuning, Model training (supervised/unsupervised/semisupervised/self supervised/reinforcement/continual) , Model evaluation)
+        3. Model deployment (Model serialization, Integration, Architecture, Monitoring, Updates, Compliance)
+        [PS: Some of these are obviously optional, so take into consideration when validating]
+    - Validation for how well each decision works with another (Eg: certain types of data work well with regression but not so well with decision trees).
+        Provide suggestions as the user is building their pipeline and warn them when something may not work well together. 
+    - Provide copyable code snippets for each part of each phase. These can be pre-written segments of code which the user can customize.
+    - Allow user to export their pipeline diagram as an image.
+    - ***[maybe later] Generate a custom jupyter notebook based on the pipeline created 
+
+Other Features:
+    - Allow the user to select draggable/droppable elements from a sidebar menu 
+        ~ Will have pre-determined elements [commonly/popularly used models, ingestion methods, training methods, etc.]
+        ~ Will allow the user to create their own elements
+        ~ Each stage  of the pipeline will be represented with different shapes/colours
+    - Linient validation. If the way in which the user connects their pipeline doesn't make sense according to my ruleset, display a warning.
+        However, if the user is experienced, they may know what they are doing. Thus, let them.
+    - Validation implemented by showing error/warning pop-ups telling the user what exactly will not work if they connect in a certain way.
+    - Provide options for deployment with links
+    - ***[maybe later] Chatbot where they can import their pipeline and ask queries.
+
+The project's task (for now) is simply to help generate a graph-like pipeline diagram for the user's convenience. This is a visualization/planning tool, not an agentic 
+SaaS that will give the user a finished product. 

@@ -1,0 +1,17 @@
+Node types:
+    - Data nodes
+        ~ Ingest node
+        ~ Preprocessing node
+        ~ Exploration node
+        ~ Feature Engineering node
+        ~ Data splitting node
+    - Model nodes
+        ~ Selected model nodes
+            > Model name
+            > Model type
+        ~ Training node
+            > Training method
+            > Hyperparameters (tuneable within node) 
+        ~ Evaluation node
+    - Deployment nodes
+        

@@ -9,11 +9,13 @@ Main project outcome:
         [PS: Some of these are obviously optional, so take into consideration when validating]
     - Validation for how well each decision works with another (Eg: certain types of data work well with regression but not so well with decision trees).
         Provide suggestions as the user is building their pipeline and warn them when something may not work well together. 
-    - Provide copyable code snippets for each part of each phase. These can be pre-written segments of code which the user can customize.
+    - Provide copyable code snippets for each part of each phase. These can be pre-written segments of code which the user can copy and paste into their workspace.
     - Allow user to export their pipeline diagram as an image.
-    - ***[maybe later] Generate a custom jupyter notebook based on the pipeline created 
+    - Generate a custom jupyter notebook based on the pipeline created --> pre-determined template, the code snippets are filled in according to the pipeline created by the user
 
 Other Features:
+    - User may save/load their pipeline designs and create new ones.
+    - Store designs in database and access using login.
     - Allow the user to select draggable/droppable elements from a sidebar menu 
         ~ Will have pre-determined elements [commonly/popularly used models, ingestion methods, training methods, etc.]
         ~ Will allow the user to create their own elements
@@ -24,5 +26,26 @@ Other Features:
     - Provide options for deployment with links
     - ***[maybe later] Chatbot where they can import their pipeline and ask queries.
 
-The project's task (for now) is simply to help generate a graph-like pipeline diagram for the user's convenience. This is a visualization/planning tool, not an agentic 
+IMPORTANT:
+The project's task is simply to help generate a graph-like pipeline diagram for the user's convenience. This is a visualization/planning tool, not an agentic 
 SaaS that will give the user a finished product. 
+
+Design Details:
+    - Home page:
+        ~ There must be home/landing page, where the user may view their projects, load them, create new ones, etc.
+        ~ If the user is not logged in yet, the home page should just show a register/login prompt, and enable them to signup or login. 
+        ~ Signup/login => simple email+password for now with basic regex validation.
+    - Pipeline Canvas [Using Reactflow]:
+        ~ Black reactflow background, with a light gray dotted design.
+        ~ Nodes of different shapes and colours depending on their type.
+    - Sidebar:
+        ~ Similar to Canva's element selection sidebar, with categories and options for pipeline elements.
+    - Header, Footer:
+        ~ Footer should not be visible on the designing page, only on the home page.
+        ~ Header should greet the user on the home page, and have only the save/load/new options on the design page.
+    - UI elements (frontend/src/components/ui/):
+        ~ Use shadcn ui (https://github.com/shadcn-ui/ui)
+    - General design style:
+        ~ Simple, non-confusing UI with more focus on functionality and smoothness.
+        ~ Black and white colour scheme (Zinc/Neutral from https://tailwindcss.com/docs/colors), with a modern look.
+        ~ No sharp corners anywhere.

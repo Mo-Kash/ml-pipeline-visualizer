@@ -15,7 +15,7 @@ Main project outcome:
 
 Other Features:
     - User may save/load their pipeline designs and create new ones.
-    - Store designs in database and access using login.
+    - Store designs in database or local storage and access using login.
     - Allow the user to select draggable/droppable elements from a sidebar menu 
         ~ Will have pre-determined elements [commonly/popularly used models, ingestion methods, training methods, etc.]
         ~ Will allow the user to create their own elements

@@ -1,6 +1,6 @@
 import React from 'react'
 import { Handle, Position, type NodeProps } from '@xyflow/react'
-import { cn } from '../../lib/utils'
+import { cn } from '../lib/utils'
 
 interface BaseNodeProps extends NodeProps {
     category: 'data' | 'model' | 'deployment'
@@ -28,9 +28,9 @@ export function BaseNode({ data, selected, category }: BaseNodeProps) {
             />
 
             <div className="flex flex-col gap-1">
-                <div className="font-semibold text-sm">{data.label}</div>
-                {data.subtitle && (
-                    <div className="text-xs opacity-80">{data.subtitle}</div>
+                <div className="font-semibold text-sm">{data.label as React.ReactNode}</div>
+                {data.subtitle as React.ReactNode && (
+                    <div className="text-xs opacity-80">{data.subtitle as React.ReactNode}</div>
                 )}
             </div>
 

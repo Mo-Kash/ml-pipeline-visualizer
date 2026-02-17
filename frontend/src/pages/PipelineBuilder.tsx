@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useParams } from 'react-router-dom'
 import { useProjectStore } from '../state/projectStore'
 import { usePipelineStore } from '../state/pipelineStore'
@@ -6,6 +6,8 @@ import Header from '../components/layout/Header'
 import PipelineCanvas from '../components/pipeline/PipelineCanvas'
 import NodeSidebar from '../components/pipeline/NodeSidebar'
 import NodeConfigPanel from '../components/pipeline/NodeConfigPanel'
+import NotificationList from '../components/notifications/NotificationList'
+import CodeViewPanel from '../components/code/CodeViewPanel'
 
 const PipelineBuilder = () => {
   const { projectId } = useParams<{ projectId: string }>()
@@ -46,6 +48,9 @@ const PipelineBuilder = () => {
 
         <NodeConfigPanel />
       </div>
+
+      <NotificationList />
+      <CodeViewPanel />
     </div>
   )
 }

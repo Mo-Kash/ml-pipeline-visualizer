@@ -3,8 +3,12 @@ import { useLocation, useNavigate } from 'react-router-dom'
 import { useAuthStore } from '../../state/authStore'
 import { useProjectStore } from '../../state/projectStore'
 import { usePipelineStore } from '../../state/pipelineStore'
+import { useNotificationStore } from '../../state/notificationStore'
 import { Button } from '../ui/Button'
-import { LogOut, Save, FolderOpen, FilePlus, Download } from 'lucide-react'
+import { LogOut, Save, FolderOpen, FilePlus, Download, FileImage, FileCode } from 'lucide-react'
+import { exportToImage, exportToNotebook } from '../../services/export/exportService'
+import { generatePipelineCode } from '../../services/codegen/generator'
+import { useState } from 'react'
 
 const Header = () => {
   const location = useLocation()
@@ -15,6 +19,8 @@ const Header = () => {
   const updateProject = useProjectStore((state) => state.updateProject)
   const nodes = usePipelineStore((state) => state.nodes)
   const edges = usePipelineStore((state) => state.edges)
+  const { addNotification } = useNotificationStore()
+  const [showExportMenu, setShowExportMenu] = useState(false)
 
   const isBuilderPage = location.pathname.startsWith('/builder')
 
@@ -26,6 +32,12 @@ const Header = () => {
   const handleSave = () => {
     if (currentProject) {
       updateProject(currentProject.id, nodes, edges)
+      addNotification({
+        type: 'success',
+        message: 'Pipeline saved successfully',
+        dismissible: true,
+        duration: 2000,
+      })
     }
   }
 
@@ -35,6 +47,38 @@ const Header = () => {
 
   const handleLoad = () => {
     navigate('/')
+  }
+
+  const handleExportImage = async (format: 'png' | 'svg') => {
+    try {
+      await exportToImage(nodes, { format, filename: `${currentProject?.name || 'pipeline'}.${format}` })
+      addNotification({
+        type: 'success',
+        message: `Exported as ${format.toUpperCase()}`,
+        dismissible: true,
+        duration: 2000,
+      })
+    } catch (error) {
+      addNotification({
+        type: 'error',
+        message: 'Failed to export image',
+        dismissible: true,
+        duration: 3000,
+      })
+    }
+    setShowExportMenu(false)
+  }
+
+  const handleExportNotebook = () => {
+    const generatedCode = generatePipelineCode(nodes, edges)
+    exportToNotebook(nodes, generatedCode.fullCode, currentProject?.name || 'ML Pipeline')
+    addNotification({
+      type: 'success',
+      message: 'Exported as Jupyter Notebook',
+      dismissible: true,
+      duration: 2000,
+    })
+    setShowExportMenu(false)
   }
 
   if (isBuilderPage) {

@@ -23,11 +23,14 @@
     --input: 240 5.9% 90%;
     --ring: 240 5.9% 10%;
     --radius: 0.75rem;
-    
+
     /* Node category colors */
-    --node-data: 217 91% 60%;      /* Blue */
-    --node-model: 142 71% 45%;     /* Green */
-    --node-deployment: 45 93% 47%; /* Yellow/Gold */
+    --node-data: 217 91% 60%;
+    /* Blue */
+    --node-model: 142 71% 45%;
+    /* Green */
+    --node-deployment: 45 93% 47%;
+    /* Yellow/Gold */
   }
 
   .dark {
@@ -55,18 +58,10 @@
 }
 
 @layer base {
-  * {
-    @apply border-border;
-  }
-  
   body {
-    @apply bg-background text-foreground;
+    background-color: hsl(var(--background));
+    color: hsl(var(--foreground));
     font-feature-settings: "rlig" 1, "calt" 1;
-  }
-  
-  /* Remove sharp corners globally */
-  button, input, select, textarea, div {
-    border-radius: var(--radius);
   }
 }
 

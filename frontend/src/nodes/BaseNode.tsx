@@ -1,4 +1,4 @@
-import React from 'react'
+
 import { Handle, Position, type NodeProps } from '@xyflow/react'
 import { cn } from '../lib/utils'
 

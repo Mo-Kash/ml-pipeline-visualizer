@@ -16,7 +16,7 @@ export function AccordionItem({
   const [isOpen, setIsOpen] = React.useState(defaultOpen)
 
   return (
-    <div className="border-b border-border">
+    <div className="border-b border-zinc-800">
       <button
         className="flex w-full items-center justify-between py-4 text-sm font-medium transition-all hover:underline"
         onClick={() => setIsOpen(!isOpen)}

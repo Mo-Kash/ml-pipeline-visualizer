@@ -1,14 +1,9 @@
-// import { useState } from 'react'
 import './index.css'
-import PipelineBuilder from './pages/PipelineBuilder'
+import { RouterProvider } from 'react-router-dom'
+import { router } from './router'
 
 function App() {
-
-  return (
-    <>
-      <PipelineBuilder />
-    </>
-  )
+  return <RouterProvider router={router} />
 }
 
 export default App

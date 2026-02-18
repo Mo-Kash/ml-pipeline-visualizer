@@ -1,16 +1,83 @@
 import { type NodeConfig, type ModelSelectionNodeData } from '../../types/nodeTypes'
 
+// Model options grouped by task type
+const classificationModels = [
+    { value: 'LogisticRegression', label: 'Logistic Regression' },
+    { value: 'DecisionTree', label: 'Decision Tree' },
+    { value: 'RandomForest', label: 'Random Forest' },
+    { value: 'GradientBoosting', label: 'Gradient Boosting' },
+    { value: 'XGBoost', label: 'XGBoost' },
+    { value: 'LightGBM', label: 'LightGBM' },
+    { value: 'SVM', label: 'Support Vector Machine (SVM)' },
+    { value: 'KNN', label: 'K-Nearest Neighbors (KNN)' },
+    { value: 'NaiveBayes', label: 'Naive Bayes' },
+    { value: 'MLP', label: 'MLP Neural Network' },
+]
+
+const regressionModels = [
+    { value: 'LinearRegression', label: 'Linear Regression' },
+    { value: 'Ridge', label: 'Ridge Regression' },
+    { value: 'Lasso', label: 'Lasso Regression' },
+    { value: 'ElasticNet', label: 'ElasticNet' },
+    { value: 'DecisionTree', label: 'Decision Tree Regressor' },
+    { value: 'RandomForest', label: 'Random Forest Regressor' },
+    { value: 'GradientBoosting', label: 'Gradient Boosting Regressor' },
+    { value: 'XGBoost', label: 'XGBoost Regressor' },
+    { value: 'SVR', label: 'Support Vector Regressor (SVR)' },
+]
+
+const clusteringModels = [
+    { value: 'KMeans', label: 'K-Means' },
+    { value: 'DBSCAN', label: 'DBSCAN' },
+    { value: 'Agglomerative', label: 'Agglomerative Clustering' },
+    { value: 'GaussianMixture', label: 'Gaussian Mixture Model' },
+]
+
+const anomalyModels = [
+    { value: 'IsolationForest', label: 'Isolation Forest' },
+    { value: 'OneClassSVM', label: 'One-Class SVM' },
+    { value: 'LOF', label: 'Local Outlier Factor' },
+]
+
+const timeSeriesModels = [
+    { value: 'ARIMA', label: 'ARIMA' },
+    { value: 'SARIMA', label: 'SARIMA' },
+    { value: 'Prophet', label: 'Prophet (Facebook)' },
+    { value: 'LSTM', label: 'LSTM (Deep Learning)' },
+]
+
 export const modelSelectionConfig: NodeConfig = {
     type: 'modelSelectionNode',
     label: 'Model Selection',
     category: 'model',
-    description: 'Choose ML algorithm',
+    description: 'Choose the ML algorithm and configure its hyperparameters.',
     defaultData: {
         label: 'Model Selection',
         category: 'model',
-        modelName: 'Random Forest',
-        modelType: 'Ensemble',
         taskType: 'Classification',
+        modelName: 'RandomForest',
+        modelType: 'Ensemble',
+        // Shared hyperparams
+        nEstimators: 100,
+        maxDepth: 5,
+        learningRate: 0.1,
+        // SVM
+        kernel: 'rbf',
+        svmC: 1.0,
+        gamma: 'scale',
+        // KNN
+        nNeighbors: 5,
+        // MLP
+        hiddenLayerSizes: '100,50',
+        activation: 'relu',
+        // KMeans
+        nClusters: 3,
+        // ARIMA
+        arimaP: 1,
+        arimaD: 1,
+        arimaQ: 1,
+        // Ridge/Lasso/ElasticNet
+        alpha: 1.0,
     },
     properties: [
         {
@@ -20,63 +87,248 @@ export const modelSelectionConfig: NodeConfig = {
             options: [
                 { value: 'Classification', label: 'Classification' },
                 { value: 'Regression', label: 'Regression' },
+                { value: 'Clustering', label: 'Clustering' },
+                { value: 'AnomalyDetection', label: 'Anomaly Detection' },
+                { value: 'TimeSeries', label: 'Time Series Forecasting' },
             ],
             defaultValue: 'Classification',
             required: true,
+            description: 'The type of ML problem you are solving.',
         },
+        // Classification models
         {
             key: 'modelName',
-            label: 'Model',
+            label: 'Algorithm',
             type: 'select',
-            options: [
-                { value: 'Linear Regression', label: 'Linear Regression' },
-                { value: 'Logistic Regression', label: 'Logistic Regression' },
-                { value: 'Decision Tree', label: 'Decision Tree' },
-                { value: 'Random Forest', label: 'Random Forest' },
-                { value: 'SVM', label: 'Support Vector Machine' },
-                { value: 'KNN', label: 'K-Nearest Neighbors' },
-            ],
-            defaultValue: 'Random Forest',
+            options: classificationModels,
+            defaultValue: 'RandomForest',
             required: true,
+            description: 'The ML algorithm to use.',
+            dependsOn: { key: 'taskType', value: 'Classification' },
+        },
+        // Regression models
+        {
+            key: 'modelName',
+            label: 'Algorithm',
+            type: 'select',
+            options: regressionModels,
+            defaultValue: 'LinearRegression',
+            required: true,
+            description: 'The ML algorithm to use.',
+            dependsOn: { key: 'taskType', value: 'Regression' },
+        },
+        // Clustering models
+        {
+            key: 'modelName',
+            label: 'Algorithm',
+            type: 'select',
+            options: clusteringModels,
+            defaultValue: 'KMeans',
+            required: true,
+            description: 'The clustering algorithm to use.',
+            dependsOn: { key: 'taskType', value: 'Clustering' },
+        },
+        // Anomaly models
+        {
+            key: 'modelName',
+            label: 'Algorithm',
+            type: 'select',
+            options: anomalyModels,
+            defaultValue: 'IsolationForest',
+            required: true,
+            description: 'The anomaly detection algorithm to use.',
+            dependsOn: { key: 'taskType', value: 'AnomalyDetection' },
+        },
+        // Time series models
+        {
+            key: 'modelName',
+            label: 'Algorithm',
+            type: 'select',
+            options: timeSeriesModels,
+            defaultValue: 'ARIMA',
+            required: true,
+            description: 'The forecasting algorithm to use.',
+            dependsOn: { key: 'taskType', value: 'TimeSeries' },
+        },
+        // --- Hyperparameters ---
+        {
+            key: 'nEstimators',
+            label: 'Number of Estimators',
+            type: 'slider',
+            defaultValue: 100,
+            min: 10,
+            max: 500,
+            step: 10,
+            description: 'Number of trees in the ensemble.',
+            dependsOn: { key: 'modelName', value: ['RandomForest', 'GradientBoosting', 'XGBoost', 'LightGBM', 'IsolationForest'] },
         },
         {
-            key: 'modelType',
-            label: 'Model Type',
+            key: 'maxDepth',
+            label: 'Max Tree Depth',
+            type: 'slider',
+            defaultValue: 5,
+            min: 1,
+            max: 20,
+            step: 1,
+            description: 'Maximum depth of each tree. Higher = more complex.',
+            dependsOn: { key: 'modelName', value: ['DecisionTree', 'RandomForest', 'GradientBoosting', 'XGBoost', 'LightGBM'] },
+        },
+        {
+            key: 'learningRate',
+            label: 'Learning Rate',
+            type: 'number',
+            defaultValue: 0.1,
+            min: 0.001,
+            max: 1,
+            step: 0.01,
+            placeholder: '0.1',
+            description: 'Step size for gradient updates. Lower = slower but more stable.',
+            dependsOn: { key: 'modelName', value: ['GradientBoosting', 'XGBoost', 'LightGBM'] },
+        },
+        {
+            key: 'kernel',
+            label: 'SVM Kernel',
             type: 'select',
             options: [
-                { value: 'Linear', label: 'Linear' },
-                { value: 'Tree', label: 'Tree-based' },
-                { value: 'Ensemble', label: 'Ensemble' },
-                { value: 'Neural', label: 'Neural Network' },
+                { value: 'rbf', label: 'RBF (Radial Basis Function)' },
+                { value: 'linear', label: 'Linear' },
+                { value: 'poly', label: 'Polynomial' },
+                { value: 'sigmoid', label: 'Sigmoid' },
             ],
-            defaultValue: 'Ensemble',
+            defaultValue: 'rbf',
+            dependsOn: { key: 'modelName', value: ['SVM', 'SVR'] },
+        },
+        {
+            key: 'svmC',
+            label: 'Regularization (C)',
+            type: 'number',
+            defaultValue: 1.0,
+            min: 0.01,
+            step: 0.1,
+            placeholder: '1.0',
+            description: 'Penalty for misclassification. Higher = less regularization.',
+            dependsOn: { key: 'modelName', value: ['SVM', 'SVR', 'OneClassSVM'] },
+        },
+        {
+            key: 'nNeighbors',
+            label: 'Number of Neighbors (K)',
+            type: 'slider',
+            defaultValue: 5,
+            min: 1,
+            max: 20,
+            step: 1,
+            description: 'Number of nearest neighbors to consider.',
+            dependsOn: { key: 'modelName', value: 'KNN' },
+        },
+        {
+            key: 'hiddenLayerSizes',
+            label: 'Hidden Layer Sizes',
+            type: 'text',
+            defaultValue: '100,50',
+            placeholder: 'e.g. 100,50,25',
+            description: 'Comma-separated neuron counts per hidden layer.',
+            dependsOn: { key: 'modelName', value: 'MLP' },
+        },
+        {
+            key: 'activation',
+            label: 'Activation Function',
+            type: 'select',
+            options: [
+                { value: 'relu', label: 'ReLU' },
+                { value: 'tanh', label: 'Tanh' },
+                { value: 'sigmoid', label: 'Sigmoid' },
+                { value: 'identity', label: 'Identity (Linear)' },
+            ],
+            defaultValue: 'relu',
+            dependsOn: { key: 'modelName', value: 'MLP' },
+        },
+        {
+            key: 'nClusters',
+            label: 'Number of Clusters (K)',
+            type: 'slider',
+            defaultValue: 3,
+            min: 2,
+            max: 20,
+            step: 1,
+            description: 'Number of clusters to form.',
+            dependsOn: { key: 'modelName', value: 'KMeans' },
+        },
+        {
+            key: 'alpha',
+            label: 'Regularization Strength (α)',
+            type: 'number',
+            defaultValue: 1.0,
+            min: 0,
+            step: 0.1,
+            placeholder: '1.0',
+            description: 'Regularization strength. Higher = stronger penalty.',
+            dependsOn: { key: 'modelName', value: ['Ridge', 'Lasso', 'ElasticNet'] },
+        },
+        {
+            key: 'arimaP',
+            label: 'ARIMA p (AR order)',
+            type: 'number',
+            defaultValue: 1,
+            min: 0,
+            dependsOn: { key: 'modelName', value: ['ARIMA', 'SARIMA'] },
+        },
+        {
+            key: 'arimaD',
+            label: 'ARIMA d (Differencing)',
+            type: 'number',
+            defaultValue: 1,
+            min: 0,
+            dependsOn: { key: 'modelName', value: ['ARIMA', 'SARIMA'] },
+        },
+        {
+            key: 'arimaQ',
+            label: 'ARIMA q (MA order)',
+            type: 'number',
+            defaultValue: 1,
+            min: 0,
+            dependsOn: { key: 'modelName', value: ['ARIMA', 'SARIMA'] },
         },
     ],
     codeTemplate: (data: ModelSelectionNodeData) => {
-        const modelImports: Record<string, string> = {
-            'Linear Regression': 'from sklearn.linear_model import LinearRegression\n\nmodel = LinearRegression()',
-            'Logistic Regression': 'from sklearn.linear_model import LogisticRegression\n\nmodel = LogisticRegression(random_state=42)',
-            'Decision Tree': `from sklearn.tree import DecisionTreeClassifier\n\nmodel = DecisionTreeClassifier(random_state=42)`,
-            'Random Forest': `from sklearn.ensemble import RandomForestClassifier\n\nmodel = RandomForestClassifier(n_estimators=100, random_state=42)`,
-            'SVM': `from sklearn.svm import SVC\n\nmodel = SVC(kernel='rbf', random_state=42)`,
-            'KNN': `from sklearn.neighbors import KNeighborsClassifier\n\nmodel = KNeighborsClassifier(n_neighbors=5)`,
+        const modelCode: Record<string, string> = {
+            LogisticRegression: `from sklearn.linear_model import LogisticRegression\n\nmodel = LogisticRegression(random_state=42, max_iter=1000)`,
+            DecisionTree: `from sklearn.tree import DecisionTreeClassifier\n\nmodel = DecisionTreeClassifier(max_depth=${data.maxDepth || 5}, random_state=42)`,
+            RandomForest: `from sklearn.ensemble import RandomForestClassifier\n\nmodel = RandomForestClassifier(\n    n_estimators=${data.nEstimators || 100},\n    max_depth=${data.maxDepth || 5},\n    random_state=42\n)`,
+            GradientBoosting: `from sklearn.ensemble import GradientBoostingClassifier\n\nmodel = GradientBoostingClassifier(\n    n_estimators=${data.nEstimators || 100},\n    max_depth=${data.maxDepth || 5},\n    learning_rate=${data.learningRate || 0.1},\n    random_state=42\n)`,
+            XGBoost: `# pip install xgboost\nfrom xgboost import XGBClassifier\n\nmodel = XGBClassifier(\n    n_estimators=${data.nEstimators || 100},\n    max_depth=${data.maxDepth || 5},\n    learning_rate=${data.learningRate || 0.1},\n    random_state=42\n)`,
+            LightGBM: `# pip install lightgbm\nfrom lightgbm import LGBMClassifier\n\nmodel = LGBMClassifier(\n    n_estimators=${data.nEstimators || 100},\n    max_depth=${data.maxDepth || 5},\n    learning_rate=${data.learningRate || 0.1},\n    random_state=42\n)`,
+            SVM: `from sklearn.svm import SVC\n\nmodel = SVC(kernel='${data.kernel || 'rbf'}', C=${data.svmC || 1.0}, random_state=42)`,
+            KNN: `from sklearn.neighbors import KNeighborsClassifier\n\nmodel = KNeighborsClassifier(n_neighbors=${data.nNeighbors || 5})`,
+            NaiveBayes: `from sklearn.naive_bayes import GaussianNB\n\nmodel = GaussianNB()`,
+            MLP: `from sklearn.neural_network import MLPClassifier\n\nmodel = MLPClassifier(\n    hidden_layer_sizes=(${data.hiddenLayerSizes || '100,50'}),\n    activation='${data.activation || 'relu'}',\n    random_state=42,\n    max_iter=500\n)`,
+            LinearRegression: `from sklearn.linear_model import LinearRegression\n\nmodel = LinearRegression()`,
+            Ridge: `from sklearn.linear_model import Ridge\n\nmodel = Ridge(alpha=${data.alpha || 1.0})`,
+            Lasso: `from sklearn.linear_model import Lasso\n\nmodel = Lasso(alpha=${data.alpha || 1.0})`,
+            ElasticNet: `from sklearn.linear_model import ElasticNet\n\nmodel = ElasticNet(alpha=${data.alpha || 1.0})`,
+            SVR: `from sklearn.svm import SVR\n\nmodel = SVR(kernel='${data.kernel || 'rbf'}', C=${data.svmC || 1.0})`,
+            KMeans: `from sklearn.cluster import KMeans\n\nmodel = KMeans(n_clusters=${data.nClusters || 3}, random_state=42)\nlabels = model.fit_predict(X)`,
+            DBSCAN: `from sklearn.cluster import DBSCAN\n\nmodel = DBSCAN(eps=0.5, min_samples=5)\nlabels = model.fit_predict(X)`,
+            Agglomerative: `from sklearn.cluster import AgglomerativeClustering\n\nmodel = AgglomerativeClustering(n_clusters=3)\nlabels = model.fit_predict(X)`,
+            GaussianMixture: `from sklearn.mixture import GaussianMixture\n\nmodel = GaussianMixture(n_components=3, random_state=42)\nlabels = model.fit_predict(X)`,
+            IsolationForest: `from sklearn.ensemble import IsolationForest\n\nmodel = IsolationForest(n_estimators=${data.nEstimators || 100}, contamination='auto', random_state=42)\noutliers = model.fit_predict(X)  # -1 = anomaly, 1 = normal`,
+            OneClassSVM: `from sklearn.svm import OneClassSVM\n\nmodel = OneClassSVM(kernel='${data.kernel || 'rbf'}', nu=0.05)\noutliers = model.fit_predict(X)  # -1 = anomaly, 1 = normal`,
+            LOF: `from sklearn.neighbors import LocalOutlierFactor\n\nmodel = LocalOutlierFactor(n_neighbors=20, contamination='auto')\noutliers = model.fit_predict(X)  # -1 = anomaly, 1 = normal`,
+            ARIMA: `# pip install statsmodels\nfrom statsmodels.tsa.arima.model import ARIMA\n\nmodel = ARIMA(y_train, order=(${data.arimaP || 1}, ${data.arimaD || 1}, ${data.arimaQ || 1}))\nresult = model.fit()\nforecast = result.forecast(steps=10)\nprint(forecast)`,
+            SARIMA: `# pip install statsmodels\nfrom statsmodels.tsa.statespace.sarimax import SARIMAX\n\nmodel = SARIMAX(y_train, order=(${data.arimaP || 1}, ${data.arimaD || 1}, ${data.arimaQ || 1}), seasonal_order=(1,1,1,12))\nresult = model.fit()\nforecast = result.forecast(steps=10)\nprint(forecast)`,
+            Prophet: `# pip install prophet\nfrom prophet import Prophet\nimport pandas as pd\n\ndf_prophet = pd.DataFrame({'ds': dates, 'y': values})\nmodel = Prophet()\nmodel.fit(df_prophet)\nfuture = model.make_future_dataframe(periods=30)\nforecast = model.predict(future)\nprint(forecast[['ds', 'yhat', 'yhat_lower', 'yhat_upper']].tail())`,
+            LSTM: `# pip install tensorflow\nimport numpy as np\nfrom tensorflow.keras.models import Sequential\nfrom tensorflow.keras.layers import LSTM, Dense\n\nmodel = Sequential([\n    LSTM(50, return_sequences=True, input_shape=(X_train.shape[1], X_train.shape[2])),\n    LSTM(50),\n    Dense(1)\n])\nmodel.compile(optimizer='adam', loss='mse')\nmodel.summary()`,
         }
-
-        return modelImports[data.modelName] || modelImports['Random Forest']
+        return modelCode[data.modelName] || `# Model: ${data.modelName}\n# Configure your model here`
     },
     validationRules: [
         {
             type: 'warning',
-            condition: (data, pipeline) => {
-                return data.modelName === 'Logistic Regression' && data.taskType === 'Regression'
-            },
+            condition: (data) => data.modelName === 'LogisticRegression' && data.taskType === 'Regression',
             message: 'Logistic Regression is for classification, not regression tasks',
         },
         {
             type: 'warning',
-            condition: (data, pipeline) => {
-                return data.modelName === 'Linear Regression' && data.taskType === 'Classification'
-            },
+            condition: (data) => data.modelName === 'LinearRegression' && data.taskType === 'Classification',
             message: 'Linear Regression is for regression, not classification tasks',
         },
     ],

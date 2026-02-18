@@ -26,7 +26,7 @@ export interface ExplorationNodeData extends BaseNodeData {
 }
 
 export interface FeatureEngineeringNodeData extends BaseNodeData {
-    transformationType: 'Polynomial' | 'Selection' | 'Domain' | 'None'
+    transformationType: 'Polynomial' | 'Selection' | 'Domain' | 'None' | 'PCA' | 'LogTransform' | 'Binning'
     polynomialDegree?: number
 }
 
@@ -78,10 +78,16 @@ export interface NodeConfig {
 export interface NodeProperty {
     key: string
     label: string
-    type: 'text' | 'select' | 'number' | 'boolean' | 'multiselect'
+    type: 'text' | 'select' | 'number' | 'boolean' | 'multiselect' | 'slider' | 'textarea' | 'tags'
     options?: { value: string; label: string }[]
     defaultValue: any
     required?: boolean
+    min?: number
+    max?: number
+    step?: number
+    placeholder?: string
+    description?: string
+    dependsOn?: { key: string; value: any }
 }
 
 export interface ValidationRule {

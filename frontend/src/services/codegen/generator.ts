@@ -1,5 +1,5 @@
 import { type Node, type Edge } from '@xyflow/react'
-import { NODE_TEMPLATES, type CodeTemplate } from './templates'
+import { getNodeConfig } from '../../nodeConfigs'
 
 export interface GeneratedCode {
     fullCode: string
@@ -8,72 +8,75 @@ export interface GeneratedCode {
 }
 
 /**
- * Generate Python code from a pipeline
+ * Generate Python code from a pipeline using each node's codeTemplate function.
  * @param nodes - Array of pipeline nodes
  * @param edges - Array of pipeline edges
- * @returns Generated Python code with imports
+ * @returns Generated Python code
  */
 export function generatePipelineCode(nodes: Node[], edges: Edge[]): GeneratedCode {
-    const imports = new Set<string>()
     const nodeCode = new Map<string, string>()
     const codeBlocks: string[] = []
 
     // Sort nodes in execution order (topological sort)
     const sortedNodes = topologicalSort(nodes, edges)
 
-    // Generate code for each node
+    // Generate code for each node using its config's codeTemplate
     sortedNodes.forEach(node => {
-        const template = NODE_TEMPLATES[node.type || '']
-        if (!template) return
+        const config = getNodeConfig(node.type as string)
+        if (!config) return
 
-        const config = node.data?.config || {}
-        const codeTemplate = template(config)
+        // Pass the full node data (which includes all config values)
+        const code = config.codeTemplate(node.data)
+        if (!code || !code.trim()) return
 
-        // Add imports
-        codeTemplate.imports.forEach(imp => imports.add(imp))
-
-        // Store node code
-        nodeCode.set(node.id, codeTemplate.code)
-        codeBlocks.push(codeTemplate.code)
+        nodeCode.set(node.id, code)
+        codeBlocks.push(`# ── ${config.label} ──\n${code}`)
     })
 
-    // Build full code
-    const importSection = Array.from(imports).join('\n')
-    const codeSection = codeBlocks.join('\n\n')
+    // Extract top-level import lines from all code blocks
+    const importLines = new Set<string>()
+    const bodyBlocks: string[] = []
 
-    const fullCode = `${importSection}
+    codeBlocks.forEach(block => {
+        const lines = block.split('\n')
+        const nonImportLines: string[] = []
+        lines.forEach(line => {
+            if (/^(import |from )/.test(line.trim())) {
+                importLines.add(line.trim())
+            } else {
+                nonImportLines.push(line)
+            }
+        })
+        const body = nonImportLines.join('\n').trim()
+        if (body) bodyBlocks.push(body)
+    })
 
-# ML Pipeline Generated Code
-# Generated from pipeline visualizer
+    const importSection = Array.from(importLines).join('\n')
+    const codeSection = bodyBlocks.join('\n\n')
 
-${codeSection}
-`
+    const fullCode = nodes.length === 0
+        ? '# Add nodes to your pipeline to generate code'
+        : `${importSection}\n\n# ═══════════════════════════════════════════\n# ML Pipeline — Generated Code\n# ═══════════════════════════════════════════\n\n${codeSection}\n`
 
     return {
         fullCode,
-        imports: Array.from(imports),
+        imports: Array.from(importLines),
         nodeCode,
     }
 }
 
 /**
- * Topological sort of nodes based on edges
- * @param nodes - Array of nodes
- * @param edges - Array of edges
- * @returns Sorted array of nodes in execution order
+ * Topological sort of nodes based on edges (Kahn's algorithm).
  */
 function topologicalSort(nodes: Node[], edges: Edge[]): Node[] {
-    // Build adjacency list and in-degree map
     const adjList = new Map<string, string[]>()
     const inDegree = new Map<string, number>()
 
-    // Initialize
     nodes.forEach(node => {
         adjList.set(node.id, [])
         inDegree.set(node.id, 0)
     })
 
-    // Build graph
     edges.forEach(edge => {
         const neighbors = adjList.get(edge.source) || []
         neighbors.push(edge.target)
@@ -81,37 +84,27 @@ function topologicalSort(nodes: Node[], edges: Edge[]): Node[] {
         inDegree.set(edge.target, (inDegree.get(edge.target) || 0) + 1)
     })
 
-    // Kahn's algorithm for topological sort
     const queue: string[] = []
     const sorted: Node[] = []
 
-    // Add nodes with no incoming edges
     inDegree.forEach((degree, nodeId) => {
-        if (degree === 0) {
-            queue.push(nodeId)
-        }
+        if (degree === 0) queue.push(nodeId)
     })
 
     while (queue.length > 0) {
         const nodeId = queue.shift()!
         const node = nodes.find(n => n.id === nodeId)
-        if (node) {
-            sorted.push(node)
-        }
+        if (node) sorted.push(node)
 
-        // Reduce in-degree for neighbors
         const neighbors = adjList.get(nodeId) || []
         neighbors.forEach(neighbor => {
             const newDegree = (inDegree.get(neighbor) || 0) - 1
             inDegree.set(neighbor, newDegree)
-            if (newDegree === 0) {
-                queue.push(neighbor)
-            }
+            if (newDegree === 0) queue.push(neighbor)
         })
     }
 
-    // If sorted length doesn't match nodes length, there's a cycle
-    // Return nodes in original order as fallback
+    // Fallback: if cycle detected, return original order
     if (sorted.length !== nodes.length) {
         console.warn('Cycle detected in pipeline, using original node order')
         return nodes
@@ -121,22 +114,7 @@ function topologicalSort(nodes: Node[], edges: Edge[]): Node[] {
 }
 
 /**
- * Generate code for a single node
- * @param node - The node to generate code for
- * @returns Code template for the node
- */
-export function generateNodeCode(node: Node): CodeTemplate | null {
-    const template = NODE_TEMPLATES[node.type || '']
-    if (!template) return null
-
-    const config = node.data?.config || {}
-    return template(config)
-}
-
-/**
- * Export code as a downloadable file
- * @param code - The code to export
- * @param filename - Name of the file
+ * Export code as a downloadable file.
  */
 export function downloadCode(code: string, filename: string = 'pipeline.py') {
     const blob = new Blob([code], { type: 'text/plain' })

@@ -127,7 +127,7 @@ const NodeConfigPanel = () => {
       <div className="flex-1 overflow-y-auto p-4">
         {config && deduplicatedProperties.length > 0 ? (
           <div className="space-y-5">
-            {config.properties.map((prop) => (
+            {deduplicatedProperties.map((prop) => (
               <ConfigField
                 key={`${prop.key}-${prop.dependsOn?.value ?? 'base'}`}
                 property={prop}

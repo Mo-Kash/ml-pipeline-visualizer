@@ -5,7 +5,6 @@ import {
   Controls,
   MiniMap,
   type Node,
-  type NodeTypes,
   type Connection,
   BackgroundVariant,
 } from '@xyflow/react'
@@ -15,27 +14,8 @@ import { useConfigStore } from '../../state/configStore'
 import { useNotificationStore } from '../../state/notificationStore'
 import { validatePipeline } from '../../services/validation/validationService'
 import { validateConnection, getEdgeStyle, type NodeCategory } from '../../services/validation/compatibilityMatrix'
-
-// Import node components
-import { IngestNode } from '../../nodes/data/IngestNode'
-import { PreprocessNode } from '../../nodes/data/PreprocessNode'
-import { ExplorationNode } from '../../nodes/data/ExplorationNode'
-import { FeatureEngineeringNode } from '../../nodes/data/FeatureEngineeringNode'
-import { DataSplitNode } from '../../nodes/data/DataSplitNode'
-import { ModelSelectionNode } from '../../nodes/model/ModelSelectionNode'
-import { TrainingNode } from '../../nodes/model/TrainingNode'
-import { EvaluationNode } from '../../nodes/model/EvaluationNode'
-
-const nodeTypes: NodeTypes = {
-  dataIngest: IngestNode,
-  preprocess: PreprocessNode,
-  exploration: ExplorationNode,
-  featureEngineering: FeatureEngineeringNode,
-  dataSplit: DataSplitNode,
-  modelSelection: ModelSelectionNode,
-  training: TrainingNode,
-  evaluation: EvaluationNode,
-}
+import { nodeTypes } from '../../nodes'
+import { getNodeConfig } from '../../nodeConfigs'
 
 const PipelineCanvas = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
@@ -129,14 +109,18 @@ const PipelineCanvas = () => {
         y: event.clientY - reactFlowBounds.top - 20,
       }
 
+      // Get default data from node config so fields are pre-populated
+      const nodeConfig = getNodeConfig(type)
+      const defaultData = nodeConfig?.defaultData ?? {}
+
       const newNode: Node = {
         id: `${type}-${Date.now()}`,
         type,
         position,
         data: {
+          ...defaultData,
           label,
           category,
-          config: {},
         },
       }
 

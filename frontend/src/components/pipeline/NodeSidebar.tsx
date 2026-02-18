@@ -26,35 +26,35 @@ interface NodeType {
 const nodeTypes: NodeType[] = [
   // Data Processing
   {
-    type: 'dataIngest',
+    type: 'ingestNode',
     label: 'Data Ingestion',
     icon: <Database className="w-4 h-4" />,
     category: 'data',
     description: 'Load data from various sources'
   },
   {
-    type: 'preprocess',
+    type: 'preprocessNode',
     label: 'Preprocessing',
     icon: <Settings className="w-4 h-4" />,
     category: 'data',
     description: 'Clean and transform data'
   },
   {
-    type: 'exploration',
+    type: 'explorationNode',
     label: 'Data Exploration',
     icon: <BarChart3 className="w-4 h-4" />,
     category: 'data',
     description: 'Analyze and visualize data'
   },
   {
-    type: 'featureEngineering',
+    type: 'featureEngineeringNode',
     label: 'Feature Engineering',
     icon: <Wrench className="w-4 h-4" />,
     category: 'data',
     description: 'Create and select features'
   },
   {
-    type: 'dataSplit',
+    type: 'dataSplitNode',
     label: 'Data Split',
     icon: <Split className="w-4 h-4" />,
     category: 'data',
@@ -62,21 +62,21 @@ const nodeTypes: NodeType[] = [
   },
   // Model Development
   {
-    type: 'modelSelection',
+    type: 'modelSelectionNode',
     label: 'Model Selection',
     icon: <Brain className="w-4 h-4" />,
     category: 'model',
     description: 'Choose ML algorithm'
   },
   {
-    type: 'training',
+    type: 'trainingNode',
     label: 'Model Training',
     icon: <Play className="w-4 h-4" />,
     category: 'model',
     description: 'Train the model'
   },
   {
-    type: 'evaluation',
+    type: 'evaluationNode',
     label: 'Model Evaluation',
     icon: <Target className="w-4 h-4" />,
     category: 'model',
@@ -84,7 +84,7 @@ const nodeTypes: NodeType[] = [
   },
   // Deployment
   {
-    type: 'deployment',
+    type: 'deploymentNode',
     label: 'Deployment',
     icon: <Cloud className="w-4 h-4" />,
     category: 'deployment',

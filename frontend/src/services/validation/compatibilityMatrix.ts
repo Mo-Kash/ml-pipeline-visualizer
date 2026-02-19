@@ -28,7 +28,7 @@ const COMPATIBILITY_RULES: Record<string, {
         allowed: ['preprocess', 'exploration', 'featureEngineering', 'dataSplit'],
         warnings: ['dataSplit'], // Skipping preprocessing might be suboptimal
         suggestions: {
-            dataSplit: 'Consider adding preprocessing before splitting data',
+            dataSplit: 'Consider preprocessing before splitting data',
         },
     },
     preprocess: {
@@ -89,8 +89,7 @@ const DATA_MODEL_COMPATIBILITY: Record<string, {
     suboptimal: string[]
     incompatible: string[]
 }> = {
-    // This would be expanded based on actual data types
-    // For now, we'll use general rules
+    // *******FOR LATER*************
     tabular: {
         optimal: ['linearRegression', 'logisticRegression', 'randomForest', 'decisionTree', 'xgboost'],
         suboptimal: ['neuralNetwork'],

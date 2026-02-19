@@ -16,7 +16,7 @@ export function BaseNode({ data, selected, category }: BaseNodeProps) {
     return (
         <div
             className={cn(
-                'px-4 py-3 rounded-lg shadow-lg min-w-[150px] border-2 transition-all',
+                'px-4 py-3 rounded-lg shadow-lg min-w-37.5 border-2 transition-all',
                 categoryClasses[category],
                 selected && 'ring-2 ring-white ring-offset-2 ring-offset-black'
             )}

@@ -59,7 +59,7 @@ const NotificationList = () => {
                     {notification.dismissible && (
                         <button
                             onClick={() => removeNotification(notification.id)}
-                            className="flex-shrink-0 hover:opacity-70 transition-opacity"
+                            className="shrink-0 hover:opacity-70 transition-opacity"
                         >
                             <X className="w-4 h-4" />
                         </button>

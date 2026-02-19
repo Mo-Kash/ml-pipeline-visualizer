@@ -47,7 +47,7 @@ export const TagsInput: React.FC<TagsInputProps> = ({
             {label && (
                 <label className="block text-sm font-medium text-zinc-300 mb-2">{label}</label>
             )}
-            <div className="min-h-[38px] flex flex-wrap gap-1.5 items-center px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg focus-within:border-violet-500 focus-within:ring-1 focus-within:ring-violet-500 transition-colors">
+            <div className="min-h-9.5 flex flex-wrap gap-1.5 items-center px-3 py-2 bg-zinc-800 border border-zinc-700 rounded-lg focus-within:border-violet-500 focus-within:ring-1 focus-within:ring-violet-500 transition-colors">
                 {value.map((tag) => (
                     <span
                         key={tag}
@@ -70,7 +70,7 @@ export const TagsInput: React.FC<TagsInputProps> = ({
                     onKeyDown={handleKeyDown}
                     onBlur={() => inputValue && addTag(inputValue)}
                     placeholder={value.length === 0 ? placeholder : ''}
-                    className="flex-1 min-w-[80px] bg-transparent text-sm text-zinc-200 placeholder:text-zinc-500 outline-none"
+                    className="flex-1 min-w-20 bg-transparent text-sm text-zinc-200 placeholder:text-zinc-500 outline-none"
                 />
             </div>
             {description && (

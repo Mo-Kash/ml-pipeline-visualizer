@@ -83,34 +83,7 @@ const COMPATIBILITY_RULES: Record<string, {
     },
 }
 
-// Data type compatibility with models
-const DATA_MODEL_COMPATIBILITY: Record<string, {
-    optimal: string[]
-    suboptimal: string[]
-    incompatible: string[]
-}> = {
-    // *******FOR LATER*************
-    tabular: {
-        optimal: ['linearRegression', 'logisticRegression', 'randomForest', 'decisionTree', 'xgboost'],
-        suboptimal: ['neuralNetwork'],
-        incompatible: ['cnn', 'rnn'],
-    },
-    image: {
-        optimal: ['cnn', 'neuralNetwork'],
-        suboptimal: ['randomForest'],
-        incompatible: ['linearRegression', 'logisticRegression'],
-    },
-    text: {
-        optimal: ['rnn', 'transformer', 'neuralNetwork'],
-        suboptimal: ['randomForest'],
-        incompatible: ['linearRegression'],
-    },
-    timeSeries: {
-        optimal: ['rnn', 'lstm', 'arima'],
-        suboptimal: ['randomForest', 'xgboost'],
-        incompatible: ['cnn'],
-    },
-}
+
 
 export function validateConnection(
     sourceType: string,

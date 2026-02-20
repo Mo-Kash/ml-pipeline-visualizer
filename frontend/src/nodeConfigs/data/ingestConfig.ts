@@ -112,7 +112,7 @@ export const ingestConfig: NodeConfig = {
     validationRules: [
         {
             type: 'error',
-            condition: (data, pipeline) => {
+            condition: (_data, pipeline) => {
                 const ingestNodes = pipeline.nodes.filter((n: any) => n.type === 'ingestNode')
                 return ingestNodes.length > 1
             },

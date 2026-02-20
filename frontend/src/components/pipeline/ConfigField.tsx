@@ -4,7 +4,6 @@ import { SliderInput } from '../ui/SliderInput'
 import { ToggleSwitch } from '../ui/ToggleSwitch'
 import { MultiSelectField } from '../ui/MultiSelectField'
 import { TagsInput } from '../ui/TagsInput'
-import { cn } from '../../lib/utils'
 
 interface ConfigFieldProps {
     property: NodeProperty

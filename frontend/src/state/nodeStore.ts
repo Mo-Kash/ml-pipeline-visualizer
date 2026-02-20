@@ -88,7 +88,7 @@ const initialNodes: NodeDefinition[] = [
     },
 ]
 
-export const useNodeStore = create<NodeStoreState>((set, get) => ({
+export const useNodeStore = create<NodeStoreState>((_set, get) => ({
     availableNodes: initialNodes,
 
     getNodesByCategory: (category) => {

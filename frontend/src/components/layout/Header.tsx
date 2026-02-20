@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
-import { useViewportStore } from '../../state/viewportStore'
+//import { useViewportStore } from '../../state/viewportStore'
 import { useAuthStore } from '../../state/authStore'
 import { useProjectStore } from '../../state/projectStore'
 import { usePipelineStore } from '../../state/pipelineStore'
@@ -8,9 +8,12 @@ import { useNotificationStore } from '../../state/notificationStore'
 import { Button } from '../ui/Button'
 import {
   LogOut, Save, FolderOpen, FilePlus, Download,
-  FileImage, Notebook, Trash2, CheckCircle2, Loader2, ChevronDown,
+  //FileImage, 
+  Notebook, Trash2, CheckCircle2, Loader2, ChevronDown,
 } from 'lucide-react'
-import { exportToImage, exportToNotebook } from '../../services/export/exportService'
+import { 
+  //exportToImage, 
+  exportToNotebook } from '../../services/export/exportService'
 import { generatePipelineCode } from '../../services/codegen/generator'
 
 type SaveStatus = 'saved' | 'saving' | 'idle'
@@ -28,7 +31,7 @@ const Header = () => {
   const { addNotification } = useNotificationStore()
 
   // Viewport controls — registered by PipelineCanvas's ViewportRegistrar
-  const { fitView, getViewport, setViewport } = useViewportStore()
+  //const { fitView, getViewport, setViewport } = useViewportStore()
 
   const [showExportMenu, setShowExportMenu] = useState(false)
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle')
@@ -78,32 +81,32 @@ const Header = () => {
     })
   }
 
-  const handleExportImage = async (e: React.MouseEvent, format: 'png' | 'svg') => {
-    e.stopPropagation()
-    setShowExportMenu(false)
-    try {
-      await exportToImage(nodes, {
-        format,
-        filename: `${currentProject?.name || 'pipeline'}.${format}`,
-        fitViewFn: fitView,
-        getViewportFn: getViewport,
-        setViewportFn: setViewport,
-      })
-      addNotification({
-        type: 'success',
-        message: `Exported as ${format.toUpperCase()}`,
-        dismissible: true,
-        duration: 2000,
-      })
-    } catch {
-      addNotification({
-        type: 'error',
-        message: 'Failed to export image. Make sure the canvas has nodes.',
-        dismissible: true,
-        duration: 4000,
-      })
-    }
-  }
+  // const handleExportImage = async (e: React.MouseEvent, format: 'png' | 'svg') => {
+  //   e.stopPropagation()
+  //   setShowExportMenu(false)
+  //   try {
+  //     await exportToImage(nodes, {
+  //       format,
+  //       filename: `${currentProject?.name || 'pipeline'}.${format}`,
+  //       fitViewFn: fitView,
+  //       getViewportFn: getViewport,
+  //       setViewportFn: setViewport,
+  //     })
+  //     addNotification({
+  //       type: 'success',
+  //       message: `Exported as ${format.toUpperCase()}`,
+  //       dismissible: true,
+  //       duration: 2000,
+  //     })
+  //   } catch {
+  //     addNotification({
+  //       type: 'error',
+  //       message: 'Failed to export image. Make sure the canvas has nodes.',
+  //       dismissible: true,
+  //       duration: 4000,
+  //     })
+  //   }
+  // }
 
   const handleExportNotebook = (e: React.MouseEvent) => {
     e.stopPropagation()

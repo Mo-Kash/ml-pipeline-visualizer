@@ -206,7 +206,8 @@ const Header = () => {
                     </p>
                   </div>
 
-                  <button
+                  {/*some issues with image export, removed for now*/}
+                  {/*<button
                     onClick={(e) => handleExportImage(e, 'png')}
                     className="w-full flex items-center gap-3 px-4 py-3 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
                   >
@@ -226,7 +227,7 @@ const Header = () => {
                       <div className="font-medium">SVG Vector</div>
                       <div className="text-xs text-zinc-500">Scalable vector graphic</div>
                     </div>
-                  </button>
+                  </button>*/}
 
                   <button
                     onClick={handleExportNotebook}

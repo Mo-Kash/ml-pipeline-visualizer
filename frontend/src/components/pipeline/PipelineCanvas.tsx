@@ -1,14 +1,16 @@
-import { useCallback, useRef, useEffect } from 'react'
+import { useCallback, useEffect, useRef } from 'react'
 import {
   ReactFlow,
   Background,
   Controls,
   MiniMap,
+  useReactFlow,
   type Node,
   type Connection,
   BackgroundVariant,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
+import { useViewportStore } from '../../state/viewportStore'
 import { usePipelineStore } from '../../state/pipelineStore'
 import { useConfigStore } from '../../state/configStore'
 import { useNotificationStore } from '../../state/notificationStore'
@@ -16,6 +18,21 @@ import { validatePipeline } from '../../services/validation/validationService'
 import { validateConnection, getEdgeStyle, type NodeCategory } from '../../services/validation/compatibilityMatrix'
 import { nodeTypes } from '../../nodes'
 import { getNodeConfig } from '../../nodeConfigs'
+
+/**
+ * Registers React Flow's viewport utilities into the global viewport store
+ * so components outside the ReactFlow provider (e.g. Header) can call them.
+ */
+const ViewportRegistrar = () => {
+  const { fitView, getViewport, setViewport } = useReactFlow()
+  const { registerViewportControls } = useViewportStore()
+
+  useEffect(() => {
+    registerViewportControls(fitView, getViewport, setViewport)
+  }, [fitView, getViewport, setViewport, registerViewportControls])
+
+  return null
+}
 
 const PipelineCanvas = () => {
   const reactFlowWrapper = useRef<HTMLDivElement>(null)
@@ -230,6 +247,7 @@ const PipelineCanvas = () => {
             return '#71717a'
           }}
         />
+        <ViewportRegistrar />
       </ReactFlow>
     </div>
   )

@@ -1,6 +1,6 @@
 import { toPng, toSvg } from 'html-to-image'
 import { getNodesBounds, getViewportForBounds } from '@xyflow/react'
-import type { Node } from '@xyflow/react'
+import type { Node, Viewport } from '@xyflow/react'
 
 export interface ExportOptions {
     format: 'png' | 'svg'
@@ -8,12 +8,18 @@ export interface ExportOptions {
     backgroundColor?: string
     width?: number
     height?: number
+    /** Called before capture to fit all nodes in view */
+    fitViewFn?: ((opts?: { padding?: number; duration?: number }) => void) | null
+    /** Returns the current viewport so it can be restored after capture */
+    getViewportFn?: (() => Viewport) | null
+    /** Restores the viewport after capture */
+    setViewportFn?: ((viewport: Viewport, opts?: { duration?: number }) => void) | null
 }
 
 /**
- * Export the pipeline canvas to an image
- * @param nodes - Array of pipeline nodes
- * @param options - Export options
+ * Export the pipeline canvas to an image.
+ * Temporarily fits all nodes into view before capturing so that a zoomed-in
+ * canvas does not result in a cropped image.
  */
 export async function exportToImage(
     nodes: Node[],
@@ -25,6 +31,9 @@ export async function exportToImage(
         backgroundColor = '#000000',
         width = 1920,
         height = 1080,
+        fitViewFn,
+        getViewportFn,
+        setViewportFn,
     } = options
 
     // Get the canvas element
@@ -33,16 +42,28 @@ export async function exportToImage(
         throw new Error('Canvas element not found')
     }
 
+    // Save the current viewport so we can restore it after export
+    const previousViewport = getViewportFn != null ? getViewportFn() : undefined
+
     try {
-        // Calculate bounds to fit all nodes
+        // Fit all nodes into view before capturing
+        if (fitViewFn != null) {
+            fitViewFn({ padding: 0.15, duration: 0 })
+            // Wait two animation frames for React Flow to re-render
+            await new Promise<void>((resolve) => {
+                requestAnimationFrame(() => requestAnimationFrame(() => resolve()))
+            })
+        }
+
+        // Calculate bounds to fit all nodes (for the style transform fallback)
         const nodesBounds = getNodesBounds(nodes)
         const viewport = getViewportForBounds(
             nodesBounds,
             width,
             height,
-            0.5, // min zoom
-            2, // max zoom
-            0.1 // padding
+            0.5,   // min zoom
+            2,     // max zoom
+            0.15   // padding
         )
 
         // Create image based on format
@@ -71,26 +92,37 @@ export async function exportToImage(
         document.body.appendChild(link)
         link.click()
         document.body.removeChild(link)
-    } catch (error) {
-        console.error('Error exporting to image:', error)
-        throw error
+    } finally {
+        // Always restore the user's original viewport
+        if (setViewportFn != null && previousViewport != null) {
+            setViewportFn(previousViewport, { duration: 300 })
+        }
     }
 }
 
+export interface NotebookExportData {
+    /** Top-level import lines collected from all node code */
+    imports: string[]
+    /** Per-node code keyed by node id (in execution order) */
+    nodeCode: Map<string, string>
+    /** Nodes in execution order (must align with nodeCode) */
+    sortedNodes: Node[]
+}
+
 /**
- * Export the pipeline to a Jupyter notebook (.ipynb)
- * @param nodes - Array of pipeline nodes sorted in execution order
- * @param generatedCode - Generated Python code
- * @param projectName - Name of the project
+ * Export the pipeline to a Jupyter notebook (.ipynb).
+ *
+ * Builds cells from the structured code data returned by `generatePipelineCode`
+ * rather than re-parsing the combined string, so no code is lost.
  */
 export function exportToNotebook(
-    nodes: Node[],
-    generatedCode: string,
+    data: NotebookExportData,
     projectName: string = 'ML Pipeline'
 ): void {
-    const cells: any[] = []
+    const { imports, nodeCode, sortedNodes } = data
+    const cells: object[] = []
 
-    // Add title cell
+    // ── Title cell ──────────────────────────────────────────────────────────
     cells.push({
         cell_type: 'markdown',
         metadata: {},
@@ -103,45 +135,49 @@ export function exportToNotebook(
         ],
     })
 
-    // Add imports cell
-    cells.push({
-        cell_type: 'code',
-        execution_count: null,
-        metadata: {},
-        outputs: [],
-        source: [
-            '# Import required libraries\n',
-            generatedCode.split('\n\n')[0], // First section should be imports
-        ],
-    })
+    // ── Imports cell ─────────────────────────────────────────────────────────
+    if (imports.length > 0) {
+        cells.push({
+            cell_type: 'code',
+            execution_count: null,
+            metadata: {},
+            outputs: [],
+            source: imports.map((line, i) =>
+                i < imports.length - 1 ? `${line}\n` : line
+            ),
+        })
+    }
 
-    // Add a cell for each node
-    const codeBlocks = generatedCode.split('\n\n').slice(1) // Skip imports
-    nodes.forEach((node, index) => {
-        // Add markdown cell with node description
+    // ── One section per node ─────────────────────────────────────────────────
+    sortedNodes.forEach((node, index) => {
+        const code = nodeCode.get(node.id)
+        if (!code) return
+
+        // Markdown label cell
         cells.push({
             cell_type: 'markdown',
             metadata: {},
             source: [
-                `## ${index + 1}. ${node.data?.label || node.type}\n`,
+                `## ${index + 1}. ${(node.data?.label as string) || node.type}\n`,
                 '\n',
-                `Category: ${node.data?.category || 'unknown'}\n`,
+                `Category: ${(node.data?.category as string) || 'unknown'}\n`,
             ],
         })
 
-        // Add code cell with node code
-        if (codeBlocks[index]) {
-            cells.push({
-                cell_type: 'code',
-                execution_count: null,
-                metadata: {},
-                outputs: [],
-                source: [codeBlocks[index]],
-            })
-        }
+        // Code cell — split into per-line source array as Jupyter expects
+        const lines = code.split('\n')
+        cells.push({
+            cell_type: 'code',
+            execution_count: null,
+            metadata: {},
+            outputs: [],
+            source: lines.map((line, i) =>
+                i < lines.length - 1 ? `${line}\n` : line
+            ).filter((line, i, arr) => !(i === arr.length - 1 && line === '')),
+        })
     })
 
-    // Create notebook structure
+    // ── Notebook structure ───────────────────────────────────────────────────
     const notebook = {
         cells,
         metadata: {

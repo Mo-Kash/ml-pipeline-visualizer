@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate } from 'react-router-dom'
+import { useViewportStore } from '../../state/viewportStore'
 import { useAuthStore } from '../../state/authStore'
 import { useProjectStore } from '../../state/projectStore'
 import { usePipelineStore } from '../../state/pipelineStore'
@@ -25,6 +26,9 @@ const Header = () => {
   const edges = usePipelineStore((state) => state.edges)
   const clearPipeline = usePipelineStore((state) => state.clearPipeline)
   const { addNotification } = useNotificationStore()
+
+  // Viewport controls — registered by PipelineCanvas's ViewportRegistrar
+  const { fitView, getViewport, setViewport } = useViewportStore()
 
   const [showExportMenu, setShowExportMenu] = useState(false)
   const [saveStatus, setSaveStatus] = useState<SaveStatus>('idle')
@@ -74,12 +78,16 @@ const Header = () => {
     })
   }
 
-  const handleExportImage = async (format: 'png' | 'svg') => {
+  const handleExportImage = async (e: React.MouseEvent, format: 'png' | 'svg') => {
+    e.stopPropagation()
     setShowExportMenu(false)
     try {
       await exportToImage(nodes, {
         format,
         filename: `${currentProject?.name || 'pipeline'}.${format}`,
+        fitViewFn: fitView,
+        getViewportFn: getViewport,
+        setViewportFn: setViewport,
       })
       addNotification({
         type: 'success',
@@ -97,10 +105,22 @@ const Header = () => {
     }
   }
 
-  const handleExportNotebook = () => {
+  const handleExportNotebook = (e: React.MouseEvent) => {
+    e.stopPropagation()
     setShowExportMenu(false)
-    const generatedCode = generatePipelineCode(nodes, edges)
-    exportToNotebook(nodes, generatedCode.fullCode, currentProject?.name || 'ML Pipeline')
+    const { imports, nodeCode } = generatePipelineCode(nodes, edges)
+
+    // Build sorted nodes in the same execution order the generator used
+    // (nodeCode is keyed by node id in insertion order = topological order)
+    const sortedNodeIds = Array.from(nodeCode.keys())
+    const sortedNodes = sortedNodeIds
+      .map((id) => nodes.find((n) => n.id === id))
+      .filter((n): n is NonNullable<typeof n> => n !== undefined)
+
+    exportToNotebook(
+      { imports, nodeCode, sortedNodes },
+      currentProject?.name || 'ML Pipeline'
+    )
     addNotification({
       type: 'success',
       message: 'Exported as Jupyter Notebook',
@@ -187,7 +207,7 @@ const Header = () => {
                   </div>
 
                   <button
-                    onClick={() => handleExportImage('png')}
+                    onClick={(e) => handleExportImage(e, 'png')}
                     className="w-full flex items-center gap-3 px-4 py-3 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
                   >
                     <FileImage className="w-4 h-4 text-blue-400" />
@@ -198,7 +218,7 @@ const Header = () => {
                   </button>
 
                   <button
-                    onClick={() => handleExportImage('svg')}
+                    onClick={(e) => handleExportImage(e, 'svg')}
                     className="w-full flex items-center gap-3 px-4 py-3 text-sm text-zinc-300 hover:bg-zinc-800 hover:text-white transition-colors"
                   >
                     <FileImage className="w-4 h-4 text-purple-400" />

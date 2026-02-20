@@ -1,7 +1,7 @@
 # ML Pipeline Visualizer
 
-A browser-based tool for visually designing machine learning pipelines, validating their structure, and generating executable Python code — without writing any boilerplate by hand.
-
+A browser-based tool for visually designing machine learning pipelines, validating their structure, and generating executable Python code, without writing any boilerplate by hand.
+Live preview: https://ml-visualizer-mokash.netlify.app/
 ---
 
 ## Features
@@ -27,8 +27,7 @@ A browser-based tool for visually designing machine learning pipelines, validati
 - Code panel updates live as you add or configure nodes
 
 **Export**
-- Download the pipeline as a Jupyter Notebook (.ipynb) — one cell per node, with import and markdown sections
-- Export the canvas as a PNG or SVG image (full pipeline captured regardless of zoom level)
+- Download the pipeline as a Jupyter Notebook (.ipynb) [one cell per node, with import and markdown sections]
 
 **Project Management**
 - Create and name multiple projects
@@ -68,7 +67,7 @@ npm install
 npm run dev
 ```
 
-The app will be available at `http://localhost:5173`.
+The app will locally be available at `http://localhost:5173`.
 
 ```bash
 # Type-check the project
@@ -83,12 +82,11 @@ npm run build
 ## How to Use
 
 1. **Sign up or log in** on the landing page.
-2. **Create a new project** — give it a name and optional description.
+2. **Create a new project** by giving it a name and optional description.
 3. **Drag nodes** from the left sidebar onto the canvas.
 4. **Connect nodes** by dragging from one node's output handle to another's input handle. The edge color indicates whether the connection is valid.
-5. **Configure a node** by clicking it — a panel opens on the right where you can set parameters specific to that step.
+5. **Configure a node** on clicking it, a panel opens on the right where you can set parameters specific to that step.
 6. **View the generated code** using the code panel at the bottom. It updates as you build.
 7. **Export** using the Export button in the header:
    - *Jupyter Notebook* — downloads a `.ipynb` file with one cell per pipeline step.
-   - *PNG / SVG* — captures the full canvas as an image.
 8. **Save** manually with the Save button, or rely on auto-save (triggers one second after any change).

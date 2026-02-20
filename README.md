@@ -1,8 +1,8 @@
 # ML Pipeline Visualizer
 
 A browser-based tool for visually designing machine learning pipelines, validating their structure, and generating executable Python code, without writing any boilerplate by hand.
-Live preview: https://ml-visualizer-mokash.netlify.app/
 ---
+Live preview: https://ml-visualizer-mokash.netlify.app/
 
 ## Features
 
